@@ -16,7 +16,7 @@ module Wox
       
       options[:info_plist] ||= 'Resources/Info.plist'
       options[:version] ||= Plist::parse_xml(options[:info_plist])['CFBundleVersion']
-      options[:project_name] ||= xcodebuild_list.first.scan(/project\s\"([^\"]+)/i).flatten.first
+      options[:project_name] ||= workspaces.first
       options[:full_name] ||= "#{self[:project_name]} #{self[:version]}"
       options[:build_dir] ||= 'build'
       options[:sdk] ||= 'iphoneos'
@@ -24,6 +24,7 @@ module Wox
       options[:target] ||= targets.first
       options[:app_file] ||= self[:project_name]
       options[:target_or_scheme] ||= 'target'
+      options[:project_or_ws] ||= 'project' 
   
       if options[:ipa_name]
         options[:ipa_file] ||= File.join self[:build_dir], 
@@ -60,6 +61,18 @@ module Wox
         xcodebuild_list.slice(start_line...end_line).map{|l| l.gsub('(Active)','').strip }
       end
     end
+
+    def workspaces 
+      @workspaces = Dir.glob("*.xcworkspace").concat(Dir.glob("*.xcodeproj"))
+    end
+
+    def schemes
+      @schemes ||= begin
+        start_line = xcodebuild_list.find_index{ |l| l =~ /configurations/i } + 1
+        end_line = xcodebuild_list.find_index{ |l| l =~ /if no/i } - 1
+        xcodebuild_list.slice start_line...end_line                
+      end
+    end
     
     def [](name)
       fail "You need to specify :#{name} in Rakefile" unless @options[name]
@@ -70,8 +83,7 @@ module Wox
       @options[name]
     end
         
-    private
-    
+    private    
       def xcodebuild_list
         @xcodebuild_list ||= `xcodebuild -list`.lines.map{|l| l.strip }.to_a
       end
