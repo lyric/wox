@@ -18,7 +18,7 @@ module Wox
       options[:version] ||= Plist::parse_xml(options[:info_plist])['CFBundleVersion']
       options[:project_name] ||= workspaces.first
       options[:full_name] ||= "#{self[:project_name]} #{self[:version]}"
-      options[:build_dir] ||= 'build'
+      options[:build_dir] ||= `pwd`.strip() + '/build'
       options[:sdk] ||= 'iphoneos'
       options[:configuration] ||= 'Release'
       options[:target] ||= targets.first
