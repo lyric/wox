@@ -8,7 +8,7 @@ module Wox
       @parent_task = parent_task
     end
   end
-  
+
   class Tasks
     def self.create options = {}, &block
       tasks = self.new(BuildEnvironment.new(options))
@@ -17,26 +17,31 @@ module Wox
     end
 
     include TasksScope
-    
+
     def default_tasks
       namespace :info do
         desc "List available sdks"
         task :sdks do
           puts environment.sdks.join("\n")
         end
-      
+
         desc "List available configurations"
         task :configurations do
           puts environment.configurations.join("\n")
         end
-        
+
         desc "List project targets"
         task :targets do
           puts environment.targets.join("\n")
         end
+
+        desc "List project schemes"
+        task :schemes do
+          puts environment.targets.join("\n")
+        end
       end
     end
-    
+
     def build name, options, &block
       environment.apply options do |e|
         t = nil
@@ -49,10 +54,10 @@ module Wox
       end
     end
   end
-  
+
   class BuildTasks
     include TasksScope
-    
+
     def ipa name, options, &block
       environment.apply options.merge({:ipa_name => name}) do |e|
         t = nil
@@ -60,16 +65,16 @@ module Wox
           desc "Creates #{e[:ipa_file]}"
           t = task(name => parent_task) { Packager.new(e).package }
         end
-        
+
         tasks = IpaTasks.new(e, t)
         tasks.instance_eval &block if block_given?
       end
     end
   end
-  
+
   class IpaTasks
     include TasksScope
-    
+
     def testflight name, options
       environment.apply options do |e|
         namespace :testflight do
@@ -78,5 +83,5 @@ module Wox
         end
       end
     end
-  end  
+  end
 end
