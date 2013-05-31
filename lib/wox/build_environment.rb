@@ -11,9 +11,9 @@ module Wox
   class BuildEnvironment
     attr_reader :info_plist, :build_dir, :default_sdk
 
-    def name_from_options(options)
-      res = options[:workspace_name] || options[:project_name] || ""
-      File.basename(res, File.extname(res))
+    def best_selector(selectors)
+      res = (selectors.drop_while {|sel| sel[:arg] == nil || sel[:arg].empty? }).first
+      res[:class].new(res[:arg]) unless res == nil
     end
 
     def initialize options
@@ -21,21 +21,21 @@ module Wox
 
       options[:info_plist] ||= 'Resources/Info.plist'
       options[:version] ||= Plist::parse_xml(options[:info_plist])['CFBundleVersion']
-      # Initially check explicitly specifed project
-      # or workspace as in other case the default
-      # workspace will always overwrite specified project
-      name = name_from_options(options)
-      if name.empty?
-        options[:project_name] ||= projects.first
-        options[:workspace_name] ||= workspaces.first
-        name = name_from_options
-      end
-      options[:full_name] ||= "#{name} #{self[:version]}"
       options[:build_dir] ||= `pwd`.strip() + '/build'
       options[:sdk] ||= 'iphoneos'
       options[:configuration] ||= 'Release'
-      options[:target] ||= targets.first
-      options[:scheme] ||= schemes.first
+      options[:build_selector] = best_selector([{:class => WorkspaceBuildSelector, :arg => options[:workspace_name]},
+                                                {:class => ProjectBuildSelector, :arg => options[:project_name]},
+                                                {:class => WorkspaceBuildSelector, :arg => workspaces.first},
+                                                {:class => ProjectBuildSelector, :arg => projects.first}])
+      options[:target_selector] = best_selector([{:class => SchemeSelector, :arg => options[:scheme]},
+                                                 {:class => TargetSelector, :arg => options[:target]},
+                                                 {:class => SchemeSelector, :arg => schemes.first},
+                                                 {:class => TargetSelector, :arg => targets.first}])
+
+      name = options[:build_selector].build_name
+      options[:full_name] ||= "#{name} #{self[:version]}"
+
       options[:app_file] ||= name
 
       if options[:ipa_name]
