@@ -9,7 +9,7 @@ module Wox
 
       log_file = File.join environment[:build_dir], "build-#{configuration}.log"
 
-      run_command "xcodebuild #{environment[:build_selector].to_s} #{environment[:target_selector].to_s} -configuration #{configuration} clean build OBJROOT=#{environment[:build_dir]} SYMROOT=#{environment[:build_dir]}", :results => log_file
+      run_command "xctool #{environment[:build_selector].to_s} #{environment[:target_selector].to_s} -configuration #{configuration} clean build OBJROOT=#{environment[:build_dir]} SYMROOT=#{environment[:build_dir]}", :results => log_file
     end
   end
 end
