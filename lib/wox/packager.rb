@@ -15,7 +15,9 @@ module Wox
           
       puts "Creating #{ipa_file}"
       log_file = File.join build_dir, "ipa.log"
-      run_command "xcrun -sdk #{sdk} PackageApplication -v '#{app_file}' -o '#{File.expand_path ipa_file}' --sign '#{environment[:developer_certificate]}' --embed '#{provisioning_profile_file}'", :results => log_file
+      command = "xcrun -sdk #{sdk} PackageApplication -v '#{app_file}' -o '#{File.expand_path ipa_file}' --sign '#{environment[:developer_certificate]}' --embed '#{provisioning_profile_file}'", :results => log_file
+      puts command
+      run_command command
     end
     
     def find_matching_mobile_provision match_text
