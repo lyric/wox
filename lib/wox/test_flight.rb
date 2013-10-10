@@ -43,7 +43,7 @@ module Wox
 
     def compress_dsym
       configuration, sdk, ipa_file, build_dir = environment[:configuration], environment[:sdk], environment[:ipa_file], environment[:build_dir]
-      dsym_file = File.join build_dir, "#{configuration}-#{sdk}", environment[:app_file]
+      dsym_file = File.join build_dir, "#{configuration}-iphoneos", environment[:app_file]
       dsym_file += ".app.dSYM"
       archive =  environment[:dsym_file]
       puts "Compressing dSYM: #{archive}"
