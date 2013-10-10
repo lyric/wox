@@ -11,7 +11,7 @@ module Wox
 
       log_file = File.join environment[:build_dir], "build-#{configuration}.log"
 
-      command = "xctool #{environment[:build_selector].to_s} #{environment[:target_selector].to_s} -sdk iphoneos -configuration #{configuration} PROVISIONING_PROFILE=\"#{profile}\" clean build"
+      command = "xctool #{environment[:build_selector].to_s} #{environment[:target_selector].to_s} -sdk #{sdk} -configuration #{configuration} PROVISIONING_PROFILE=\"#{profile}\" clean build"
       puts command
       run_command command, :results => log_file
     end
