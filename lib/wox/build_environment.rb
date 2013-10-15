@@ -40,9 +40,9 @@ module Wox
 
       if options[:ipa_name]
         options[:ipa_file] ||= File.join self[:build_dir],
-                                [name, self[:version], self[:configuration], self[:ipa_name]].join("-") + ".ipa"
+                                [self[:ipa_name], self[:version], self[:configuration]].join("-") + ".ipa"
         options[:dsym_file] ||= File.join self[:build_dir],
-                                [name, self[:version], self[:configuration], self[:ipa_name]].join("-") + ".dSYM.zip"
+                                [self[:ipa_name], self[:version], self[:configuration]].join("-") + ".dSYM.zip"
       end
     end
 
